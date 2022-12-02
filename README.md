@@ -1,1 +1,1 @@
-# rdpgw-openconnect-docker
+# socks5-openconnect-gp-docker
