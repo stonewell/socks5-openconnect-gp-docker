@@ -10,6 +10,7 @@ docker automatic vpn login need a env file
 VPN_USER=<user>
 VPN_PWD=<pass>
 VPN_GW=<gateway>
+VPN_PORTAL=<portal url>
 ```
 ## Run
 ```
