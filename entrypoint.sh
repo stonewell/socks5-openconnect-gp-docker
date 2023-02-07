@@ -1,4 +1,4 @@
 #!/bin/sh
 
 /socks5 &
-/vpn-websocketd -s /vpn_interactg.sh
+/vpn-websocketd -s /vpn_interact.sh
