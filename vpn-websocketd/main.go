@@ -66,7 +66,7 @@ func main() {
 			}()
 		} else {
 			stdin.Write(msg)
-			stdin.Write([]byte("\n"))
+			stdin.Write([]byte("\r\n"))
 		}
 	})
 

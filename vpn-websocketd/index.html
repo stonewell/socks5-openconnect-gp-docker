@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Melody example: chatting</title>
+    <title>VPN Interactive</title>
   </head>
 
   <style>
@@ -15,7 +15,6 @@
 
   <body>
     <center>
-      <h3>Chat</h3>
       <pre id="chat"></pre>
       <input placeholder="say something" id="text" type="text">
     </center>
@@ -23,7 +22,6 @@
     <script>
       var url = "ws://" + window.location.host + "/ws";
       var ws = new WebSocket(url);
-      var name = "Guest" + Math.floor(Math.random() * 1000);
 
       var chat = document.getElementById("chat");
       var text = document.getElementById("text");
