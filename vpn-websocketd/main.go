@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"flag"
+	"encoding/hex"
 
 	"github.com/olahol/melody"
 )
@@ -54,7 +55,7 @@ func main() {
 	})
 
 	m.HandleMessage(func(s *melody.Session, msg []byte) {
-		log.Printf("Reading from websocket: %s", string(msg))
+		log.Printf("Reading from websocket: %s, %s", string(msg), hex.EncodeToString(msg))
 		m.Broadcast(msg)
 		if string(msg) == "start" {
 			go func() {

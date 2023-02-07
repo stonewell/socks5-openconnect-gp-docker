@@ -7,7 +7,9 @@ WORKDIR /go/src/github.com/serjs/socks5
 RUN git clone https://github.com/serjs/socks5-server.git .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-s' -o ./socks5
 
-ENTRYPOINT ["/socks5"]
+WORKDIR /go/src/github.com/stonewell/vpn-websocketd
+RUN git clone https://github.com/stonewell/socks5-openconnect-gp-docker.git .
+RUN cd vpn-websocketd && go build -o ./vpn-websocketd
 
 FROM alpine as builder-openconnect
 RUN apk add --no-cache build-base vpnc iproute2 autoconf automake intltool \
@@ -24,6 +26,8 @@ RUN ./autogen.sh && \
 FROM alpine
 
 COPY --from=builder /go/src/github.com/serjs/socks5/socks5 /
+COPY --from=builder /go/src/github.com/stonewell/vpn-websocketd/vpn-websocketd/vpn-websocketd /
+COPY --from=builder /go/src/github.com/stonewell/vpn-websocketd/vpn-websocketd/index.html /
 COPY --from=builder-openconnect /openconnect-install /
 RUN apk add --no-cache expect gnutls \
     iproute2 \
@@ -42,6 +46,9 @@ RUN apk add --no-cache expect gnutls \
 
 ADD vpn.sh /
 RUN chmod +x /vpn.sh
+
+ADD vpn_interact.sh /
+RUN chmod +x /vpn_interact.sh
 
 ADD entrypoint.sh /
 RUN chmod +x /entrypoint.sh
