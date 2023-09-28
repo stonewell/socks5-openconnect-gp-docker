@@ -13,19 +13,7 @@ import (
 	"github.com/olahol/melody"
 )
 
-func main() {
-	var scriptPath string
-	flag.StringVar(&scriptPath, "script", "", "the script to run")
-	flag.StringVar(&scriptPath, "s", "", "the script to run")
-
-	flag.Parse()
-
-	if scriptPath == "" {
-		log.Fatalf("must provide a script to run");
-	}
-
-	m := melody.New()
-
+func create_cmd(scriptPath string, m *melody.Melody) (*exec.Cmd, io.WriteCloser) {
 	cmd := exec.Command(scriptPath)
 	cmd.Stderr = os.Stderr
 	stdin, err := cmd.StdinPipe()
@@ -46,6 +34,22 @@ func main() {
 		}
 	}(reader)
 
+	return cmd, stdin
+}
+
+func main() {
+	var scriptPath string
+	flag.StringVar(&scriptPath, "script", "", "the script to run")
+	flag.StringVar(&scriptPath, "s", "", "the script to run")
+
+	flag.Parse()
+
+	if scriptPath == "" {
+		log.Fatalf("must provide a script to run");
+	}
+
+	m := melody.New()
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "index.html")
 	})
@@ -54,20 +58,33 @@ func main() {
 		m.HandleRequest(w, r)
 	})
 
+	var cmd *exec.Cmd
+	var stdin io.WriteCloser
+
 	m.HandleMessage(func(s *melody.Session, msg []byte) {
 		log.Printf("Reading from websocket: %s, %s", string(msg), hex.EncodeToString(msg))
 		m.Broadcast(msg)
+
 		if string(msg) == "start" {
 			go func() {
+				cmd, stdin = create_cmd(scriptPath, m)
 				if err := cmd.Start(); nil != err {
 					log.Fatalf("Error starting program: %s, %s", cmd.Path, err.Error())
 				}
 				cmd.Wait()
 				m.Broadcast([]byte("program finished"))
+				cmd = nil
+				stdin = nil
 			}()
+		} else if string(msg) == "stop" {
+			if cmd != nil {
+				cmd.Process.Kill()
+			}
 		} else {
-			stdin.Write(msg)
-			stdin.Write([]byte("\n"))
+			if stdin != nil {
+				stdin.Write(msg)
+				stdin.Write([]byte("\n"))
+			}
 		}
 	})
 
