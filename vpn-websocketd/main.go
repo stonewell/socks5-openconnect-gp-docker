@@ -77,6 +77,7 @@ func main() {
 				stdin = nil
 			}()
 		} else if string(msg) == "stop" {
+			log.Printf("stop process")
 			if cmd != nil {
 				cmd.Process.Kill()
 			}
