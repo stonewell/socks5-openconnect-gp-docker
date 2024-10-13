@@ -2,13 +2,13 @@ package main
 
 import (
 	"bufio"
+	"encoding/hex"
+	"flag"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
-	"flag"
-	"encoding/hex"
 
 	"github.com/olahol/melody"
 )
@@ -21,7 +21,7 @@ func main() {
 	flag.Parse()
 
 	if scriptPath == "" {
-		log.Fatalf("must provide a script to run");
+		log.Fatalf("must provide a script to run")
 	}
 
 	m := melody.New()

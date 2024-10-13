@@ -1,11 +1,9 @@
 ARG GOLANG_VERSION="1.19.1"
 
+FROM serjs/go-socks5-proxy:latest as socks5_builder
+
 FROM golang:$GOLANG_VERSION-alpine as builder
 RUN apk --no-cache add tzdata git
-WORKDIR /go/src/github.com/serjs/socks5
-
-RUN git clone https://github.com/serjs/socks5-server.git .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-s' -o ./socks5
 
 WORKDIR /go/src/github.com/stonewell/vpn-websocketd
 RUN git clone https://github.com/stonewell/socks5-openconnect-gp-docker.git .
@@ -25,7 +23,7 @@ RUN ./autogen.sh && \
 
 FROM alpine
 
-COPY --from=builder /go/src/github.com/serjs/socks5/socks5 /
+COPY --from=socks5_builder /socks5 /
 COPY --from=builder /go/src/github.com/stonewell/vpn-websocketd/vpn-websocketd/vpn-websocketd /
 COPY --from=builder /go/src/github.com/stonewell/vpn-websocketd/vpn-websocketd/index.html /
 COPY --from=builder-openconnect /openconnect-install /
