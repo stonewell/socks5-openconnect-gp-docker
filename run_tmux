@@ -1,0 +1,9 @@
+#!/bin/sh
+N=$(tmux ls 2>/dev/null | grep -v attached | head -1 | cut -d: -f1)
+
+if [[ ! -z $N ]]
+then
+    exec tmux attach -t $N
+else
+    exec tmux
+fi

@@ -44,7 +44,11 @@ RUN apk add --no-cache expect gnutls \
     pcsc-lite-libs \
     stoken \
     vpnc \
-    zlib
+    zlib \
+	tmux
+
+ADD run_tmux /
+RUN chmod +x /run_tmux
 
 ADD vpn_interact.sh /
 RUN chmod +x /vpn_interact.sh
