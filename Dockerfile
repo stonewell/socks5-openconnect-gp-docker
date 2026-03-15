@@ -1,10 +1,10 @@
 ARG GOLANG_VERSION="1.19.1"
 
 #Get socks5
-FROM serjs/go-socks5-proxy:latest as socks5_builder
+FROM serjs/go-socks5-proxy:latest AS socks5_builder
 
 #Build openconnect
-FROM alpine as openconnect_builder
+FROM alpine AS openconnect_builder
 RUN apk add --no-cache build-base vpnc iproute2 autoconf automake intltool \
 	gnutls-dev libxml2-dev krb5-dev lz4-dev libproxy-dev linux-headers stoken-dev pcsc-lite-dev oath-toolkit-dev python3-dev \
 	libtool git
@@ -17,7 +17,7 @@ RUN ./autogen.sh && \
     make install
 
 # Build gotty
-FROM golang:$GOLANG_VERSION-alpine as gotty_builder
+FROM golang:$GOLANG_VERSION-alpine AS gotty_builder
 RUN apk add --no-cache go git build-base
 RUN  mkdir -p /tmp/gotty && \
 	 GOPATH=/tmp/gotty go install github.com/sorenisanerd/gotty@latest && \
@@ -26,7 +26,7 @@ RUN  mkdir -p /tmp/gotty && \
 	 rm -rf /tmp/gotty
 
 # Build VPN
-FROM alpine
+FROM python:3-alpine
 
 COPY --from=socks5_builder /socks5 /
 COPY --from=openconnect_builder /openconnect-install /
@@ -55,5 +55,10 @@ RUN chmod +x /vpn_interact.sh
 
 ADD entrypoint.sh /
 RUN chmod +x /entrypoint.sh
+
+ADD saml.py /
+
+ADD vpn_saml.sh /
+RUN chmod +x /vpn_saml.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
