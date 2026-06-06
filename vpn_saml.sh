@@ -19,4 +19,4 @@ echo ${OC_COOKIE} | openconnect \
 		--csd-user=nobody \
 		--csd-wrapper=/libexec/openconnect/hipreport.sh \
 		--authgroup=''"${VPN_GW}"'' \
-		${VPN_PORTAL}
+		${OC_SERVER}
